@@ -1,13 +1,11 @@
 # MOPS
 Modern operating path system (MOPS)
 ## C++
-Код на плюсах изолирован в src/corelib/cpp.
-Там же для запуска отдельно выделен файл с загаловками stdc++.h, т.к. он не стандартный.
-Чтобы сделать функцию доступной из вне, нужно добавить extern "C" перед ней.
+РљРѕРґ РЅР° РїР»СЋСЃР°С… РёР·РѕР»РёСЂРѕРІР°РЅ РІ src/corelib/cpp.
+РўР°Рј Р¶Рµ РґР»СЏ Р·Р°РїСѓСЃРєР° РѕС‚РґРµР»СЊРЅРѕ РІС‹РґРµР»РµРЅ С„Р°Р№Р» СЃ Р·Р°РіР°Р»РѕРІРєР°РјРё stdc++.h, С‚.Рє. РѕРЅ РЅРµ СЃС‚Р°РЅРґР°СЂС‚РЅС‹Р№.
+Р§С‚РѕР±С‹ СЃРґРµР»Р°С‚СЊ С„СѓРЅРєС†РёСЋ РґРѕСЃС‚СѓРїРЅРѕР№ РёР· РІРЅРµ, РЅСѓР¶РЅРѕ РґРѕР±Р°РІРёС‚СЊ extern "C" РїРµСЂРµРґ РЅРµР№.
 ## Building
-Чтобы запуститься, в package выполняем cargo run;
-Файл build.rs компилирует c++ код через vs compiler (cc crate) в object файл.
-Файл src/corelib/mod.rs линкует c++ к расту.
+In package dir: `cargo run` or `cargo build` if you want only to build. In this process build.rs will compile c++ into object using vs compiler (cc crate). File src/corelib/mod.rs externs c++.
 ## Links
 
 * https://github.com/BrianPeek/legoev3
