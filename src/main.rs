@@ -26,6 +26,6 @@ fn main() {
 	//     println!("{:?}", msg);
 	// }
 	let mut ev3 = Ev3Api::new(Ev3Connection::Bluetooth);
-
+	ev3.test();
 	//tar();
 }

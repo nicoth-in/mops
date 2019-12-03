@@ -1,6 +1,8 @@
 mod types;
 pub use types::*;
-pub use std::io::{Write, Read};
+
+mod bluetooth;
+pub use bluetooth::*;
 
 pub enum Ev3Connection {
     Bluetooth,
@@ -28,12 +30,8 @@ impl Write for Ev3Adaptor {
         self.is_sent = false;
         match self.connector {
             Ev3Connection::Bluetooth => {
-                use serial::*;
-                for arg in std::env::args_os().skip(1) {
-                    let mut serial_port = serial::open(&arg)?;
-                    serial_port.write(self.buffer.as_slice());
-                    self.is_sent = true;
-                }
+                test_bt();
+                self.is_sent = true;
             },
             Ev3Connection::Usb => {
                 // ...
@@ -62,5 +60,9 @@ impl Ev3Api {
             adaptor: Ev3Adaptor::new(con),
             message: Vec::new(),
         }
+    }
+    pub fn test(&mut self) {
+        self.message = vec![0x0F, 0x00, 0x00, 0x01, 0x80, 0x00, 0x00, 0x94, 0x01, 0x81, 0x02, 0x82, 0xE8, 0x03, 0x82, 0xE8, 0x03];
+        self.adaptor.write(&self.message);
     }
 }
