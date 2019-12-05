@@ -12,10 +12,11 @@ libc = "0.2"
 # io_bluetooth = "*"
 # serial = "0.4.0"
 # serialport = "3.3.0"
-winapi = "0.3.8"
-
-
-serial-windows = "0.4.0"
+# winapi = "0.3.8"
+# serial-windows = "0.4.0"
 
 [build-dependencies]
 cc = "1.0"
+
+[target.'cfg(windows)'.dependencies]
+winapi = { version = "0.3.8", features = ["winuser", "fileapi", "winsock2", "ws2bth", "ws2def"] }
