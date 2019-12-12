@@ -32,6 +32,8 @@ impl Write for Ev3Adaptor {
             Ev3Connection::Bluetooth => {
                 unsafe {
                     startup();
+                    //jungle();
+
                 }
                 self.is_sent = true;
             },

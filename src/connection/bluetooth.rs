@@ -96,12 +96,33 @@ pub unsafe fn startup() {
 
     let mut df = winapi::um::bluetoothapis::BluetoothFindFirstDevice(const_search_params, mut_bt_info);
 
-    println!("{:#?}", df);
-    println!("Device: {:#?}", bt_info.fConnected);
+    // println!("{:#?}", df);
+
+    let mut to_str = Vec::new();
+    for item in bt_info.szName.iter() {
+    	let ch = *item as u8;
+    	if ch != 0 {
+    		to_str.push(ch);
+    	}
+    }
+    let name = std::str::from_utf8(&to_str).unwrap();
+    println!("Device {:#?} was found.", name);
+
+    if name == "UberMachina" {
+    	service_start();
+    }
+
+    
+
+    let info = winapi::um::bluetoothapis::BluetoothGetDeviceInfo(winapi::shared::ntdef::NULL, mut_bt_info);
 
     let closer = winapi::um::bluetoothapis::BluetoothFindDeviceClose(df);
 
-    println!("{:#?}", closer);
+    match closer {
+        0 => println!("Fail while closing."),
+        1 => println!("Session closed."),
+        _ => println!("Unknown error."),
+    }
 }
 
 // https://docs.microsoft.com/en-us/windows/win32/api/bluetoothapis/nf-bluetoothapis-bluetoothisconnectable
@@ -121,4 +142,29 @@ pub unsafe fn has_controller() {
 pub struct WinBluetoothHolder {
     bt_search_params: winapi::um::bluetoothapis::BLUETOOTH_DEVICE_SEARCH_PARAMS,
     bt_device_info: Vec<winapi::um::bluetoothapis::BLUETOOTH_DEVICE_INFO>,
+}
+
+unsafe fn service_start() {
+
+	let mut wrd = winapi::um::winsock2::WSADATA::default();
+	let p_wrd: *mut winapi::um::winsock2::WSADATA = &mut wrd;
+
+	let res = winapi::um::winsock2::WSAStartup(winapi::shared::minwindef::MAKEWORD(2, 2), p_wrd);
+
+	if res != 0 {
+		println!("Service start fail.");
+		return;
+	} else {
+		println!("Service started!");
+	}
+
+	let socket = winapi::um::winsock2::socket(winapi::shared::ws2def::AF_BTH, winapi::um::winsock2::SOCK_STREAM, winapi::um::ws2bth::BTHPROTO_RFCOMM as i32);
+
+	if socket == winapi::um::winsock2::INVALID_SOCKET {
+		println!("Error: invalid socket");
+		return;
+	}
+
+	let closed = winapi::um::winsock2::closesocket(socket);
+
 }
