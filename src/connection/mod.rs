@@ -30,7 +30,9 @@ impl Write for Ev3Adaptor {
         self.is_sent = false;
         match self.connector {
             Ev3Connection::Bluetooth => {
-                test_bt();
+                unsafe {
+                    startup();
+                }
                 self.is_sent = true;
             },
             Ev3Connection::Usb => {

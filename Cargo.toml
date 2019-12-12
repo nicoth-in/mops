@@ -19,4 +19,4 @@ libc = "0.2"
 cc = "1.0"
 
 [target.'cfg(windows)'.dependencies]
-winapi = { version = "0.3.8", features = ["winuser", "fileapi", "winsock2", "ws2bth", "ws2def"] }
+winapi = { version = "0.3.8", features = ["winuser", "fileapi", "winsock2", "ws2bth", "ws2def", "bluetoothapis", "impl-default"] }
