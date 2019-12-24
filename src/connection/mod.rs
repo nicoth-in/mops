@@ -31,7 +31,9 @@ impl Write for Ev3Adaptor {
         match self.connector {
             Ev3Connection::Bluetooth => {
                 unsafe {
-                    startup();
+                    let mut bt = Bluetooth::start();
+                    bt.auth();
+                    //startup();
                     //jungle();
 
                 }
