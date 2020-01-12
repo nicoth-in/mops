@@ -14,9 +14,9 @@ pub struct Ev3Adaptor {
 }
 impl Ev3Adaptor {
     /// Create new Ev3Adaptor
-    pub fn new() -> Self {
+    pub fn new(device: Option<String>) -> Self {
         Self {
-            connector: Bluetooth::new(),
+            connector: Bluetooth::new(device),
             buffer: Vec::new(),
             is_sent: false,
         }
@@ -64,7 +64,15 @@ impl Ev3Api {
     /// Generate new Ev3API and attach to the first connected EV3 via Bluetooth API
     pub fn new() -> Self {
         Self {
-            adaptor: Ev3Adaptor::new(),
+            adaptor: Ev3Adaptor::new(None),
+            message: Vec::new(),
+            counter: 0,
+        }
+    }
+    /// Generate new Ev3API and attach to the EV3 via Bluetooth API defined by device name
+    pub fn by_name<S: Into<String>>(device: S) -> Self {
+        Self {
+            adaptor: Ev3Adaptor::new(Some(device.into())),
             message: Vec::new(),
             counter: 0,
         }

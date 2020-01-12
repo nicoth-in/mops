@@ -18,8 +18,9 @@ pub struct Bluetooth {
 }
 impl Bluetooth {
 	/// Create new Bluetooth
-	// TODO: impl name/first device search
-	pub fn new() -> Bluetooth {
+	// NOT TESTED: impl name/first device search
+	// Also, need to check multi devices
+	pub fn new(dev: Option<String>) -> Bluetooth {
 		unsafe {
 			// First, we need to check if there is a controller
 		    has_controller();
@@ -44,19 +45,30 @@ impl Bluetooth {
 		    // Find first device
 		    let df = BluetoothFindFirstDevice(const_search_params, mut_bt_info);
 		    // Get it's name
-		    let mut to_str = Vec::new();
-		    for item in bt_info.szName.iter() {
-		    	let ch = *item as u8;
-		    	if ch != 0 {
-		    		to_str.push(ch);
-		    	}
-		    }
-		    let name = std::str::from_utf8(&to_str).unwrap();
+		    let name = parse_name(bt_info.szName);
 		    println!("Device {:#?} was found.", name);
 		    // If it is our module Continue
-		    if bt_info.ulClassofDevice != 2052 {
-		    	panic!("No EV3 found");
-		    }
+		    if bt_info.ulClassofDevice == 2052 {
+				match dev {
+					Some(n) => {
+						if name != n {
+							loop {
+								next_device(df, mut_bt_info);
+								let name = parse_name(bt_info.szName);
+								if n == name {
+									break;
+								}
+							}
+						}
+						// Ok
+					},
+					None => {
+						// Ok
+					}
+				}
+		    } else {
+				panic!("No EV3 found");
+			}
 			let bl = Bluetooth {
 				sock: service_start(),
 				df: df,
@@ -143,4 +155,23 @@ unsafe fn connect_to(s: winapi::um::winsock2::SOCKET, adr: winapi::shared::bthde
 	if result != 0 {
 		panic!("Error!");
 	}
+}
+
+fn next_device(sp: HBLUETOOTH_DEVICE_FIND, di: *mut BLUETOOTH_DEVICE_INFO) {
+	unsafe {
+		let u = BluetoothFindNextDevice(sp,di);
+		if u == 0 {
+			panic!("No EV3 found");
+		}
+	}
+}
+fn parse_name(raw_name: [u16; 248]) -> String {
+	let mut to_str = Vec::new();
+	for item in raw_name.iter() {
+		let ch = *item as u8;
+		if ch != 0 {
+		    to_str.push(ch);
+		}
+	}
+	return std::str::from_utf8(&to_str).unwrap().to_string();
 }
