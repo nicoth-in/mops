@@ -1,3 +1,4 @@
+#![allow(dead_code)]
 /// Motors
 pub enum Motor {
     A, B, C, D

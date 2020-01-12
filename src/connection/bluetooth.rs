@@ -5,18 +5,20 @@ pub use std::{
     mem
 };
 use winapi::shared::ntdef::NULL;
-use std::io::{Error, ErrorKind};
+//use std::io::{Error, ErrorKind};
 use winapi::um::bluetoothapis::*;
 
 // https://docs.microsoft.com/en-us/windows/win32/api/_bluetooth/index
 
+/// Bluetooth struct wich works with device (specially Ev3) via Windows 32bit API
 pub struct Bluetooth {
 	sock: winapi::um::winsock2::SOCKET,
 	df: winapi::um::bluetoothapis::HBLUETOOTH_DEVICE_FIND,
 	info: winapi::um::bluetoothapis::BLUETOOTH_DEVICE_INFO
 }
-
 impl Bluetooth {
+	/// Create new Bluetooth
+	// TODO: impl name/first device search
 	pub fn new() -> Bluetooth {
 		unsafe {
 			// First, we need to check if there is a controller
@@ -40,7 +42,7 @@ impl Bluetooth {
 		    bt_info.dwSize = std::mem::size_of::<BLUETOOTH_DEVICE_INFO>() as u32;
 		    let mut_bt_info: *mut BLUETOOTH_DEVICE_INFO = &mut bt_info;
 		    // Find first device
-		    let mut df = BluetoothFindFirstDevice(const_search_params, mut_bt_info);
+		    let df = BluetoothFindFirstDevice(const_search_params, mut_bt_info);
 		    // Get it's name
 		    let mut to_str = Vec::new();
 		    for item in bt_info.szName.iter() {
@@ -75,11 +77,9 @@ impl Bluetooth {
 		unsafe {
 			let mut msg = 0;
 			winapi::um::winsock2::send(self.sock, msg as *mut i8, lenof as i32, 0);
-			let p: *mut i8 = &mut msg;     // the same operator is used as with references
-			let p: *mut u8 = p as *mut u8;  // convert between pointer types
-			let s: &mut [u8] = unsafe { 
-			    slice::from_raw_parts_mut(p, mem::size_of::<i8>())
-			};
+			let p: *mut i8 = &mut msg;
+			let p: *mut u8 = p as *mut u8;
+			let s: &mut [u8] = slice::from_raw_parts_mut(p, mem::size_of::<i8>());
 			return s;
 		}
 	}
@@ -89,7 +89,6 @@ impl Bluetooth {
 		    close_bt(self.df);
 		}
 	}
-
 }
 
 // https://docs.microsoft.com/en-us/windows/win32/api/bluetoothapis/nf-bluetoothapis-bluetoothisconnectable
@@ -129,7 +128,7 @@ unsafe fn service_start() -> winapi::um::winsock2::SOCKET {
 	socket
 }
 unsafe fn service_end(socket: winapi::um::winsock2::SOCKET) {
-	let closed = winapi::um::winsock2::closesocket(socket);
+	let _closed = winapi::um::winsock2::closesocket(socket);
 }
 unsafe fn connect_to(s: winapi::um::winsock2::SOCKET, adr: winapi::shared::bthdef::BTH_ADDR) {
 	let mut bt_adr = winapi::um::ws2bth::SOCKADDR_BTH {
