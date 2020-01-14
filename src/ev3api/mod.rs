@@ -79,11 +79,13 @@ impl Ev3Api {
     }
     /// Set msg len (do at the end only)
     fn set_len(&mut self) {
-        self.message.insert(0, self.message.len() as u8);
+        self.message.insert(0, 0);
+        self.message.insert(0, self.message.len() as u8 - 1);
 	}
     /// Set counter of msgs
     fn set_counter(&mut self) {
         self.message.insert(0, self.counter as u8);
+        self.message.insert(0, 0);
 	}
     /// Create msg
     fn gen_msg(&mut self, typ: u8, cmd: u8) {
@@ -120,6 +122,7 @@ impl Ev3Api {
         self.message.append(&mut name);
         let mut message = message.as_bytes().to_vec();
         self.message.push(message.len() as u8);
+        self.message.push(0x00);
         self.message.append(&mut message);
         return self;
 	}

@@ -46,7 +46,6 @@ impl Bluetooth {
 		    let df = BluetoothFindFirstDevice(const_search_params, mut_bt_info);
 		    // Get it's name
 		    let name = parse_name(bt_info.szName);
-		    println!("Device {:#?} was found.", name);
 		    // If it is our module Continue
 		    if bt_info.ulClassofDevice == 2052 {
 				match dev {
@@ -56,6 +55,7 @@ impl Bluetooth {
 								next_device(df, mut_bt_info);
 								let name = parse_name(bt_info.szName);
 								if n == name {
+									println!("Device {:#?} was found.", name);
 									break;
 								}
 							}
