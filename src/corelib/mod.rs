@@ -1,12 +1,13 @@
 #![allow(dead_code)]
 extern crate libc;
 
-extern {
-    fn find_path() -> libc::c_int;
+#[repr(C)]
+struct CORES {
+
 }
 
 pub fn tar() {
     unsafe {
-        find_path()
+        let r = CORES {};
     };
 }
