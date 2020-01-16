@@ -8,12 +8,6 @@ edition = "2018"
 
 [dependencies]
 libc = "0.2"
-# bluetooth-serial-port = "0.6.0"
-# io_bluetooth = "*"
-# serial = "0.4.0"
-# serialport = "3.3.0"
-# winapi = "0.3.8"
-# serial-windows = "0.4.0"
 
 [build-dependencies]
 cc = "1.0"

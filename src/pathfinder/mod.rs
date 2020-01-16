@@ -106,7 +106,7 @@ impl Car {
 			None => {panic!("");},
 		}
 	}
-	pub fn next(&mut self) {
+	pub fn next(&mut self, DIFFDCT: &mut VecDeque<(i32, i32)>) {
 		self.last_pos = self.pos;
 		if (self.orders.len() == 0) {
 			self.usei = false;
@@ -124,28 +124,30 @@ impl Car {
 		};
 		let delta = new_pos - self.pos;
 		let last_view = self.view_dgr;
-//		if (DIFFDCT.find({ pos, newPos }) != DIFFDCT.end()) {
-//		    command = "F";
-//		}
-		match delta {
-			1 => {
-				self.view_dgr = 90;
-				self.detect_cmd(last_view, self.view_dgr);
-			},
-			-1 => {
-				self.view_dgr = 270;
-				self.detect_cmd(last_view, self.view_dgr);
-			},
-			-10 => {
-				self.view_dgr = 0;
-				self.detect_cmd(last_view, self.view_dgr);
-			},
-			10 => {
-				self.view_dgr = 180;
-				self.detect_cmd(last_view, self.view_dgr);
-			},
-			_ => {
-				self.command = "S".into();
+
+		if DIFFDCT.contains(&(self.pos, new_pos)) {
+		    self.command = "F".into();
+		} else {
+			match delta {
+				1 => {
+					self.view_dgr = 90;
+					self.detect_cmd(last_view, self.view_dgr);
+				},
+				-1 => {
+					self.view_dgr = 270;
+					self.detect_cmd(last_view, self.view_dgr);
+				},
+				-10 => {
+					self.view_dgr = 0;
+					self.detect_cmd(last_view, self.view_dgr);
+				},
+				10 => {
+					self.view_dgr = 180;
+					self.detect_cmd(last_view, self.view_dgr);
+				},
+				_ => {
+					self.command = "S".into();
+				}
 			}
 		}
 		self.view = match self.view_dgr {
@@ -175,6 +177,7 @@ pub struct Cores {
 	path: Path,
 	path_loc: Path,
 	tick: i32,
+	DIFFDCT: VecDeque<(i32, i32)>,
 }
 impl Cores {
 	pub fn new() -> Self {
@@ -188,6 +191,7 @@ impl Cores {
 			path: path,
 			path_loc: Vec::new(),
 			tick: 0,
+			DIFFDCT: VecDeque::new()
 		}
 	}
 	pub fn get_time(&mut self) -> i32 {
@@ -201,6 +205,10 @@ impl Cores {
 	}
 	pub fn create_const_map(&mut self, i: i32, v: Vec<i32>) {
 		self.path[i as usize] = v;
+	}
+	pub fn create_unic_map(&mut self, x: i32, y: i32,) {
+		self.DIFFDCT.push_back((x, y));
+		self.DIFFDCT.push_back((y, x));
 	}
 	pub fn find(&mut self, v1: i32, v2: i32, num: i32, time: i32, n: i32) -> VecDeque<i32> {
 		let mut data = VecDeque::new();
@@ -242,11 +250,10 @@ impl Cores {
 				}
 			}
 		}
-		println!("{:?}", p);
 		let mut j = v2;
 		while j != v1 {
 			data.push_back(j);
-			if *voider_ex.get(&j).unwrap_or(&0) != 0 {
+			if voider_ex.get(&j) != Option::Some(&0) {
 				for i in 0..(*voider_ex.get(&j).unwrap_or(&0) as usize) {
 					data.push_back(j);
 				}
@@ -280,7 +287,7 @@ impl Cores {
 	pub fn next(&mut self) -> String {
 		let mut ans = String::new();
 		for car in &mut self.car_list {
-			car.next();
+			car.next(&mut self.DIFFDCT);
 			ans += &(car.command.clone() + " ");
 		}
 		self.tick += 1;
