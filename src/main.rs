@@ -18,17 +18,24 @@ fn main() {
 //	ev3_2.end();
 	let mut a = Cores::new();
 	a.create_const_map(1, vec![2, 11]);
-	a.create_const_map(2, vec![2, 11]);
-	a.create_const_map(11, vec![2, 11]);
+	a.create_const_map(2, vec![2, 12]);
+	a.create_const_map(11, vec![2, 12]);
 	a.create_const_map(12, vec![2, 11]);
 	if a.get_time() == 0 {
 		
 		
 		
 		a.set_cars(vec![(1, 0)]);
-		
+
 		a.add_order(1, 12);
 		//a.add_order(12, 1);
+
+		for _i in 0..10 {
+			let r = a.next();
+			println!("{}", r);
+		}
+
+		
 
 
 	} else {

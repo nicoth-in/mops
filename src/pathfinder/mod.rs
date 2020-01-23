@@ -4,6 +4,7 @@ use std::cmp::max;
 
 const N: i32 = 1100;
 
+#[derive(Debug)]
 struct Move {
 	pos: i32,
 	view: i32,
@@ -22,6 +23,7 @@ impl Move {
 		}
 	}
 }
+#[derive(Debug)]
 struct Order {
 	carid: i32,
 	from: i32,
@@ -56,6 +58,7 @@ impl Order {
 		self.movements[(time-self.time_start) as usize].rotation_dgr
 	}
 }
+#[derive(Debug)]
 struct Car {
 	last_pos: i32,
 	command: String,
@@ -69,7 +72,7 @@ struct Car {
 }
 impl Car {
 	pub fn new(a: i32, v: i32, nu: i32) -> Self {
-		let mut view = match v {
+		let view = match v {
 			0 => "NORTH",
 			90 => "EAST",
 			180 => "SOUTH",
@@ -89,7 +92,7 @@ impl Car {
 		}
 	}
 	pub fn detect_cmd(&mut self, last: i32, view: i32) {
-		self.command = match (view - last) {
+		self.command = match view - last {
 			0 => "F",
 			90 => "R",
 			180 => "A",
@@ -108,13 +111,13 @@ impl Car {
 	}
 	pub fn next(&mut self, DIFFDCT: &mut VecDeque<(i32, i32)>) {
 		self.last_pos = self.pos;
-		if (self.orders.len() == 0) {
+		if self.orders.len() == 0 {
 			self.usei = false;
 			self.future_end_pos = self.pos;
 			self.command = "S".into();
 			return;
 		}
-		if (self.get_front().way.len() == 0) {
+		if self.get_front().way.len() == 0 {
 			self.orders.pop_front();
 			return;
 		}
@@ -171,6 +174,7 @@ impl Car {
 	}
 }
 type Path = Vec<Vec<i32>>;
+#[derive(Debug)]
 pub struct Cores {
 	cars_count: i32,
 	car_list: Vec<Car>,
@@ -210,7 +214,7 @@ impl Cores {
 		self.DIFFDCT.push_back((x, y));
 		self.DIFFDCT.push_back((y, x));
 	}
-	pub fn find(&mut self, v1: i32, v2: i32, num: i32, time: i32, n: i32) -> VecDeque<i32> {
+	pub fn find(&mut self, v1: i32, v2: i32, _num: i32, time: i32, n: i32) -> VecDeque<i32> {
 		let mut data = VecDeque::new();
 		let mut d = vec![N; n as usize];
 		d[v1 as usize] = 0;
@@ -221,7 +225,7 @@ impl Cores {
 		let mut timer = max(self.tick, time);
 		let mut voider_ex = HashMap::new(); 
 
-		while !(q.len() == 0) {
+		while !q.is_empty() {
 			let v: i32 = *q.front().unwrap_or(&0);
 			q.pop_front();
 			id[v as usize] = 1;
@@ -231,7 +235,7 @@ impl Cores {
 				if self.can_use() {
 					if d[to as usize] > (d[v as usize] + length) {
 						d[to as usize] = d[v as usize] + length;
-						if d[to as usize] == 0 {
+						if id[to as usize] == 0 {
 							q.push_back(to);
 						} else if id[to as usize] == 1 {
 							q.push_front(to);
@@ -250,6 +254,7 @@ impl Cores {
 				}
 			}
 		}
+		timer = 0; // is never used
 		let mut j = v2;
 		while j != v1 {
 			data.push_back(j);
@@ -281,6 +286,7 @@ impl Cores {
 		let choosen = self.find_nearest_car(pos_begin);
 		self.car_list[choosen as usize].usei = true;
 		let this_path = self.find(pos_begin, pos_end, choosen, self.tick, 1000);
+		//println!("{:?}", this_path);
 		self.car_list[choosen as usize].orders.push_back(Order::new(pos_begin, pos_end, choosen, this_path.clone(), self.tick));
 		self.car_list[choosen as usize].future_end_pos = this_path[0];
 	}
