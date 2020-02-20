@@ -153,7 +153,7 @@ unsafe fn connect_to(s: winapi::um::winsock2::SOCKET, adr: winapi::shared::bthde
     let const_bt_adr: *const winapi::um::ws2bth::SOCKADDR_BTH = mut_bt_adr;
 	let result = winapi::um::winsock2::connect(s, const_bt_adr as *const winapi::shared::ws2def::SOCKADDR, std::mem::size_of::<winapi::um::ws2bth::SOCKADDR_BTH>() as i32);
 	if result != 0 {
-		panic!("Error!");
+		panic!("Error! WinSockErr");
 	}
 }
 

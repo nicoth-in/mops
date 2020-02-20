@@ -1,0 +1,9 @@
+name: MOPS Client
+version: "1.0"
+author: Artyom & Kostya
+about: Modern Operation Path System Client
+args:
+    - path:
+        help: Sets the path
+        required: true
+        index: 1

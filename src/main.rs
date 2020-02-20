@@ -8,15 +8,13 @@ use ev3api::*;
 mod pathfinder;
 use pathfinder::*;
 
+use std::io::{self, Read};
+
+
 fn main() {
 
-//	let mut ev3_1 = Ev3Api::new();
-//	let mut ev3_2 = Ev3Api::by_name("EV3");
-//	ev3_1.bip();
-//	ev3_1.end();
-//	ev3_2.bip();
-//	ev3_2.end();
 	let mut a = Cores::new();
+
 	a.create_unic_map(11, 20);
 	a.create_unic_map(18, 29);
 	a.create_unic_map(60, 71);
@@ -87,23 +85,25 @@ fn main() {
 	if a.get_time() == 0 {
 		
 		
-		
+		let mut ev3 = Ev3Api::by_name("SERVO");
+
+		//let mut buffer = String::new();
+    	//io::stdin().read_to_string(&mut buffer).unwrap();
+    	
 		a.set_cars(vec![(11, 0)]);
 
-		a.add_order(42, 54);
-		//a.add_order(12, 1);
+		//a.add_order(42, 54);
 
-		for _i in 0..20 {
+		for _i in 0..1 {
+
 			let r = a.next();
-			println!("{}", r);
+
+			ev3.write_mail_box("CMD".into(), "run\t".into()).send();
+			
 		}
 
-		
+		ev3.end();
 
-
-	} else {
-		
 	}
-
 
 }
