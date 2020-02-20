@@ -93,12 +93,11 @@ fn main() {
 		a.set_cars(vec![(11, 0)]);
 
 		//a.add_order(42, 54);
+		ev3.write_mail_box("1R".into(), "100\t".into()).send();
 
 		for _i in 0..1 {
 
 			let r = a.next();
-
-			ev3.write_mail_box("CMD".into(), "run\t".into()).send();
 			
 		}
 
