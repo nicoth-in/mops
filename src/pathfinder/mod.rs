@@ -290,11 +290,18 @@ impl Cores {
 		self.car_list[choosen as usize].orders.push_back(Order::new(pos_begin, pos_end, choosen, this_path.clone(), self.tick));
 		self.car_list[choosen as usize].future_end_pos = this_path[0];
 	}
-	pub fn next(&mut self) -> String {
-		let mut ans = String::new();
+	pub fn next(&mut self) -> Vec<f32> {
+		let mut ans = Vec::new();
 		for car in &mut self.car_list {
 			car.next(&mut self.DIFFDCT);
-			ans += &(car.command.clone() + " ");
+			ans.push(match &car.command.clone()[..] {
+				"S" => 0.0,
+				"F" => 1.0,
+				"L" => 2.0,
+				"R" => 3.0,
+				"A" => 4.0,
+				 _  => 5.0,
+			});
 		}
 		self.tick += 1;
 		return ans;

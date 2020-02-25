@@ -3,7 +3,7 @@ mod types;
 pub use types::*;
 
 mod bluetooth;
-pub use bluetooth::*;
+use bluetooth::*;
 
 /// Adaptor wich provides I/O with Ev3
 /// Used by Ev3API
@@ -79,21 +79,23 @@ impl Ev3Api {
     }
     /// Set msg len (do at the end only)
     fn set_len(&mut self) {
-        self.message.insert(0, self.message.len() as u8);
-	}
+        self.message.insert(0, 0);
+        self.message.insert(0, self.message.len() as u8 - 1);
+    }
     /// Set counter of msgs
     fn set_counter(&mut self) {
         self.message.insert(0, self.counter as u8);
-	}
+        self.message.insert(0, 0);
+    }
     /// Create msg
     fn gen_msg(&mut self, typ: u8, cmd: u8) {
         self.message.append(&mut vec![typ, cmd]);
         self.counter += 1;
-	}
+    }
     // Clear buffer
     fn clear_buf(&mut self) {
         self.message = Vec::new();
-	}
+    }
     /// Safe close all
     pub fn end(mut self) {
         self.adaptor.flush().unwrap();
@@ -104,23 +106,30 @@ impl Ev3Api {
         self.set_len();
         self.adaptor.write(&self.message).unwrap();
         self.clear_buf();
-	}
+    }
     /// Force make "bip" signal on Ev3 to test connection
     pub fn bip(&mut self) {
         self.message = vec![0x0F, 0x00, 0x00, 0x01, 0x80, 0x00, 0x00, 0x94, 0x01, 0x81, 0x02, 0x82, 0xE8, 0x03, 0x82, 0xE8, 0x03];
         self.adaptor.write(&self.message).unwrap();
         self.clear_buf();
     }
-    /// Write mail box - factory style
-    pub fn write_mail_box(&mut self, name: String, message: String) -> &mut Self {
+    /// Write bytes to mail box
+    pub fn write_mail_box_bytes(&mut self, name: String, message: &[u8]) -> &mut Self {
         self.gen_msg(0x81, 0x9E);
         let mut name = name.as_bytes().to_vec();
         self.message.push(name.len() as u8);
         name.push(0x00);
         self.message.append(&mut name);
-        let mut message = message.as_bytes().to_vec();
+        let mut message = message.to_vec();
         self.message.push(message.len() as u8);
+        self.message.push(0x00);
         self.message.append(&mut message);
         return self;
-	}
+    }
+    /// Write f32 to mail box
+    pub fn write_mail_box_f32(&mut self, name: String, num: f32) -> &mut Self {
+        let mut vb = num.to_le_bytes().to_vec();
+        vb.remove(0);
+        self.write_mail_box_bytes(name, &vb[..])
+    }
 }

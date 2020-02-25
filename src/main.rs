@@ -9,7 +9,7 @@ mod pathfinder;
 use pathfinder::*;
 
 use std::io::{self, Read};
-
+use std::{thread, time};
 
 fn main() {
 
@@ -92,13 +92,18 @@ fn main() {
     	
 		a.set_cars(vec![(11, 0)]);
 
-		//a.add_order(42, 54);
-		ev3.write_mail_box("1R".into(), "100\t".into()).send();
+		a.add_order(42, 54);
 
-		for _i in 0..1 {
+		for _i in 0..10 {
 
 			let r = a.next();
-			
+			println!("{:?}", r[0]);
+			ev3.write_mail_box_f32("1R".into(), r[0]).send();
+
+			// For now
+			let timer = time::Duration::from_millis(2000);
+			thread::sleep(timer);
+
 		}
 
 		ev3.end();
