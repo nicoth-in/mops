@@ -75,6 +75,11 @@ impl Bluetooth {
 				info: bt_info,
 			};
 			connect_to(bl.sock, bl.info.Address);
+			//if (bl.info.fConnected == 0) {
+			//	connect_to(bl.sock, bl.info.Address);
+			//} else {
+			//	bind_to(bl.sock, bl.info.Address);
+			//}
 		    return bl
 		}
 	}
@@ -99,6 +104,16 @@ impl Bluetooth {
 		unsafe {
 			service_end(self.sock);
 		    close_bt(self.df);
+		}
+	}
+	pub fn connect(&mut self) {
+		unsafe {
+			connect_to(self.sock, self.info.Address);
+		}
+	}
+	pub fn bind(&mut self) {
+		unsafe {
+			bind_to(self.sock, self.info.Address);
 		}
 	}
 }
@@ -140,7 +155,9 @@ unsafe fn service_start() -> winapi::um::winsock2::SOCKET {
 	socket
 }
 unsafe fn service_end(socket: winapi::um::winsock2::SOCKET) {
+	//winapi::um::winsock2::WSAEventSelect(socket, );
 	let _closed = winapi::um::winsock2::closesocket(socket);
+	winapi::um::winsock2::WSACleanup();
 }
 unsafe fn connect_to(s: winapi::um::winsock2::SOCKET, adr: winapi::shared::bthdef::BTH_ADDR) {
 	let mut bt_adr = winapi::um::ws2bth::SOCKADDR_BTH {
@@ -153,7 +170,22 @@ unsafe fn connect_to(s: winapi::um::winsock2::SOCKET, adr: winapi::shared::bthde
     let const_bt_adr: *const winapi::um::ws2bth::SOCKADDR_BTH = mut_bt_adr;
 	let result = winapi::um::winsock2::connect(s, const_bt_adr as *const winapi::shared::ws2def::SOCKADDR, std::mem::size_of::<winapi::um::ws2bth::SOCKADDR_BTH>() as i32);
 	if result != 0 {
-		panic!("Error! WinSockErr");
+		panic!("Error while connecting. Maybe you are already connected your device?");
+	}
+}
+
+unsafe fn bind_to(s: winapi::um::winsock2::SOCKET, adr: winapi::shared::bthdef::BTH_ADDR) {
+	let mut bt_adr = winapi::um::ws2bth::SOCKADDR_BTH {
+	    addressFamily: winapi::um::ws2bth::AF_BTH,
+	    btAddr: adr,
+	    serviceClassId: winapi::shared::guiddef::GUID::default(),
+	    port: 1,
+	};
+    let mut_bt_adr: *mut winapi::um::ws2bth::SOCKADDR_BTH = &mut bt_adr;
+    let const_bt_adr: *const winapi::um::ws2bth::SOCKADDR_BTH = mut_bt_adr;
+	let result = winapi::um::winsock2::bind(s, const_bt_adr as *const winapi::shared::ws2def::SOCKADDR, std::mem::size_of::<winapi::um::ws2bth::SOCKADDR_BTH>() as i32);
+	if result != 0 {
+		panic!("Error while binding. Maybe you are NOT connected yet?");
 	}
 }
 

@@ -85,20 +85,36 @@ fn main() {
 	if a.get_time() == 0 {
 		
 		
-		let mut ev3 = Ev3Api::by_name("SERVO");
-
+		//let mut ev3 = Ev3Api::by_name("AVAGANGARD");
+		
 		//let mut buffer = String::new();
     	//io::stdin().read_to_string(&mut buffer).unwrap();
     	
-		a.set_cars(vec![(11, 0)]);
+		a.set_cars(vec![(42, 0), (54, 0)]);
 
-		a.add_order(42, 54);
+		a.add_order(42, 34);
+		a.add_order(54, 42);
 
-		for _i in 0..10 {
+		//ev3.write_mail_box_f32("1R".into(), 5.0).send();
+
+		for _i in 0..4 {
 
 			let r = a.next();
+			
+
+			let mut ev3 = Ev3Api::by_name("M1");
 			println!("{:?}", r[0]);
 			ev3.write_mail_box_f32("1R".into(), r[0]).send();
+			ev3.end();
+
+			// For now
+			let timer = time::Duration::from_millis(500);
+			thread::sleep(timer);
+
+			let mut ev3 = Ev3Api::by_name("M2");
+			println!("{:?}", r[1]);
+			ev3.write_mail_box_f32("1R".into(), r[1]).send();
+			ev3.end();
 
 			// For now
 			let timer = time::Duration::from_millis(2000);
@@ -106,7 +122,7 @@ fn main() {
 
 		}
 
-		ev3.end();
+		
 
 	}
 

@@ -101,6 +101,7 @@ impl Ev3Api {
         self.adaptor.flush().unwrap();
         self.adaptor.end();
     }
+    /// Send message
     pub fn send(&mut self) {
         self.set_counter();
         self.set_len();
