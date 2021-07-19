@@ -2,8 +2,8 @@
 Modern operating path system (MOPS)
 ## C++
 Код на плюсах изолирован в src/corelib/cpp.
-Там же для запуска отдельно выделен файл с загаловками stdc++.h, т.к. он не стандартный.
-Чтобы сделать функцию доступной из вне, нужно добавить extern "C" перед ней.
+Там же для запуска отдельно выделен файл с заголовками stdc++.h, т.к. он нестандартный.
+Чтобы сделать функцию доступной извне, нужно добавить extern "C" перед ней.
 ## Building
 In package dir: `cargo run` or `cargo build` if you want only to build. In this process build.rs will compile c++ into object using vs compiler (cc crate). File src/corelib/mod.rs externs c++.
 ## Links
